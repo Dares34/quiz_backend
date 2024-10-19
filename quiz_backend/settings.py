@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 'profile_user',
     # 'auth',
+    'rest_framework',
+    'rest_api',
 ]
 
 MIDDLEWARE = [
@@ -77,8 +79,12 @@ WSGI_APPLICATION = 'quiz_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'quiz',       # имя вашей базы данных
+        'USER': 'developer',           # имя пользователя
+        'PASSWORD': 'gIErkL',   # пароль пользователя
+        'HOST': '185.128.105.41',         # адрес сервера базы данных (или IP)
+        'PORT': '5433',              # порт (по умолчанию 5432)
     }
 }
 
