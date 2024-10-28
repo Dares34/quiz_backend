@@ -1,17 +1,17 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from user.models import User
+from user.models import User, Roles
 
 
 class AuthTestCase(APITestCase):
     def setUp(self):
-        # Создание пользователя для тестирования
+        self.role = Roles.objects.create(name='User Role', is_admin=False)
         self.user = User.objects.create_user(
             email='test@example.com',
             name='Test User',
             password='test_password',
-            role=None  # Если роль обязательна, укажите ее
+            role=self.role
         )
 
     def test_auth_invalid_credentials(self):
