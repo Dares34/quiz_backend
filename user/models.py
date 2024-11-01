@@ -3,7 +3,6 @@ from django.db import models
 
 
 class Roles(models.Model):
-    id = models.IntegerField(primary_key=True, serialize=True)
     name = models.CharField(max_length=255)
     is_admin = models.BooleanField(null=False, default=False)
 
