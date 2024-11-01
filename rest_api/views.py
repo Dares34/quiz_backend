@@ -7,7 +7,7 @@ from user.models import User
 from room.models import Room, Participant
 from quiz.models import Question, Quiz
 from invitation.models import Invitation
-from .serializers import UserSerializer, AuthSerializer
+from .serializers import UserSerializer, AuthSerializer, RoomSerializer
 
 
 class UsersViewSet(viewsets.ModelViewSet):
@@ -39,3 +39,8 @@ class CreateUserView(APIView):
                 'name': user.name
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RoomViewSet(viewsets.ModelViewSet):
+    queryset = Room.objects.all()
+    serializer_class = RoomSerializer
