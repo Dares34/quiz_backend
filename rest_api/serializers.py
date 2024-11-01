@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from user.models import User
-
+from room.models import Room, Participant
+from quiz.models import Question, Quiz
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,3 +19,9 @@ class UserSerializer(serializers.ModelSerializer):
 class AuthSerializer(serializers.Serializer):
     name = serializers.CharField()
     password = serializers.CharField()
+
+
+class RoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Room
+        fields = ['quizSubject', 'timer']

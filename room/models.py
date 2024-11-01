@@ -3,6 +3,7 @@ from user.models import User
 
 
 class Room(models.Model):
+    # id = models.IntegerField(primary_key=True, serialize=True)
     # name = models.CharField(max_length=255)
     quizSubject = models.CharField(max_length=255)
     timer = models.IntegerField()
