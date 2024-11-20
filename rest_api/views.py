@@ -1,34 +1,44 @@
-from django.contrib.auth import authenticate
-from rest_framework import viewsets, status
+from django.http import HttpRequest
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from user.models import User
-from room.models import Room, Participant
-from quiz.models import Question, Quiz
-from invitation.models import Invitation
-from .serializers import UserSerializer, AuthSerializer, RoomSerializer
+from .serializers import UserSerializer
+from django.contrib.auth import authenticate
 
 
-class UsersViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-
-class AuthView(APIView):
-    def post(self, request):
-        serializer = AuthSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data['name']
-        password = serializer.validated_data['password']
-        user = authenticate(username=email, password=password)
-        if user is not None:
-            return Response({'id': user.id, 'name': user.name, 'email': user.email})
-        else:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+class UsersViewSet(APIView):
+    @extend_schema(
+        request=UserSerializer,
+        parameters=[
+            OpenApiParameter(
+                name='email',
+                required=True
+            ), OpenApiParameter(
+                name='password',
+                required=True
+            )
+        ],
+        responses={201: UserSerializer, 403: "Неправильный логин или пароль"}
+    )
+    def get(self, request: HttpRequest):
+        email = request.GET.get('email', None)
+        password = request.GET.get('password', None)
+        user = authenticate(request, email=email, password=password)
+        if not user:
+            return Response('Wrong email or password', status=403)
+        return Response({
+            'name': user.name,
+            'email': user.email,
+            'role': user.role.name,  # или другой атрибут роли
+        })
 
 
 class CreateUserView(APIView):
+    @extend_schema(
+        request=UserSerializer,
+        responses={201: UserSerializer, 400: "Ошибка валидации"}
+    )
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -39,8 +49,3 @@ class CreateUserView(APIView):
                 'name': user.name
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class RoomViewSet(viewsets.ModelViewSet):
-    queryset = Room.objects.all()
-    serializer_class = RoomSerializer
