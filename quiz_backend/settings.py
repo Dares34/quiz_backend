@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'invitation',
     'rest_framework',
     'rest_api',
-    'rest_framework_swagger',
+    # 'rest_framework_swagger',
     'drf_spectacular',
 ]
 
