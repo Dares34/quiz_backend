@@ -46,7 +46,20 @@ INSTALLED_APPS = [
     
     'rest_framework',
     'rest_api',
+    # 'rest_framework_swagger',
+    'drf_spectacular',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Quiz Project API',
+    'DESCRIPTION': 'Огромная документация для огромного ЧЛЕНА',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -85,11 +98,15 @@ WSGI_APPLICATION = 'quiz_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'quiz',       # имя вашей базы данных
-        'USER': 'developer',           # имя пользователя
-        'PASSWORD': 'gIErkL',   # пароль пользователя
-        'HOST': '185.128.105.41',         # адрес сервера базы данных (или IP)
-        'PORT': '5433',              # порт (по умолчанию 5432)
+        'NAME': 'quiz',
+        'USER': 'developer',
+        'PASSWORD': 'gIErkL',
+        'HOST': '185.128.105.41',
+        'PORT': '5433',
+        'TEST': {
+            'NAME': 'test_quiz',
+            'CHARSET': 'UTF8',
+        },
     }
 }
 
@@ -116,7 +133,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 
@@ -135,4 +152,4 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'user.user'
+AUTH_USER_MODEL = 'user.User'
