@@ -3,6 +3,7 @@ from user.models import User
 from room.models import Room, Participant
 from quiz.models import Question, Quiz
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
