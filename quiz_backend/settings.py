@@ -54,7 +54,7 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Quiz Project API',
-    'DESCRIPTION': 'Огромная документация для огромного ЧЛЕНА',
+    'DESCRIPTION': 'Отсюда тырить api',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
