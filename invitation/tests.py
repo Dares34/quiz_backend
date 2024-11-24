@@ -16,14 +16,14 @@ class InvitationTests(TestCase):
         self.user4 = User.objects.create_user(email='user4@example.com', name='User 4', password='testpass')
         self.user5 = User.objects.create_user(email='user5@example.com', name='User 5', password='testpass')
 
-        # Create a room and add user1 as the owner
+        # Создание комнаты и юезра1 как зшедшего-владельца
         self.room = Room.objects.create(quizSubject="General Knowledge", timer=30)
         self.participant1 = Participant.objects.create(userId=self.user1, roomId=self.room, score=0)
 
         self.invite_url = reverse('invite_user', args=[self.room.id])
 
     def test_invite_user_success(self):
-        # Invite user2 to the room
+        # Приглашение юзера2 в комнату
         self.client.login(email='user1@example.com', password='testpass')
         response = self.client.post(self.invite_url, {'invited_user_id': self.user2.id})
 
@@ -32,12 +32,12 @@ class InvitationTests(TestCase):
         self.assertTrue(Invitation.objects.filter(room=self.room, invited_user=self.user2).exists())
 
     def test_invite_user_room_full(self):
-        # Fill the room to capacity
+        # Заполнение комнаты полностью
         Participant.objects.create(userId=self.user2, roomId=self.room, score=0)
         Participant.objects.create(userId=self.user3, roomId=self.room, score=0)
         Participant.objects.create(userId=self.user4, roomId=self.room, score=0)
 
-        # Try inviting user5 when room is full
+        # Пробуем пригласить юзера5, когда комната заполнена
         self.client.login(email='user1@example.com', password='testpass')
         response = self.client.post(self.invite_url, {'invited_user_id': self.user5.id})
 
@@ -46,19 +46,19 @@ class InvitationTests(TestCase):
         self.assertFalse(Invitation.objects.filter(room=self.room, invited_user=self.user5).exists())
 
     def test_invite_nonexistent_user(self):
-        # Attempt to invite a user who doesn't exist
+        # Тест приглашения несуществуещего пользователя
         self.client.login(email='user1@example.com', password='testpass')
         response = self.client.post(self.invite_url, {'invited_user_id': 999})
 
         self.assertEqual(response.status_code, 404)
 
     def test_invite_user_not_logged_in(self):
-        # Attempt to invite a user without logging in
+        # Приглашение пользователя без логина
         response = self.client.post(self.invite_url, {'invited_user_id': self.user2.id})
         self.assertEqual(response.status_code, 302)  # Should redirect to login page
 
     def test_invite_user_already_invited(self):
-        # Invite user2 once, then attempt to invite again
+        # Попытка дважды пригласить юзера2
         self.client.login(email='user1@example.com', password='testpass')
         Invitation.objects.create(room=self.room, invited_user=self.user2)
         response = self.client.post(self.invite_url, {'invited_user_id': self.user2.id})

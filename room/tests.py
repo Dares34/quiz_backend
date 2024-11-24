@@ -12,16 +12,16 @@ class RoomTests(TestCase):
         self.user1 = User.objects.create_user(email='user1@example.com', name='User 1', password='testpass')
         self.user2 = User.objects.create_user(email='user2@example.com', name='User 2', password='testpass')
 
-        # Create a room by user1
+        # Создание комнтаы юзером1
         self.room = Room.objects.create(quizSubject="Science", timer=60)
         self.participant1 = Participant.objects.create(userId=self.user1, roomId=self.room, score=0)
 
-        # URL paths for room operations
+        # Пути URL-адресов для операций с комнатами
         self.room_settings_url = reverse('room_settings', args=[self.room.id])
         self.start_quiz_url = reverse('start_quiz', args=[self.room.id])
 
     def test_create_room(self):
-        # Test room creation by user1
+        # Создание тестовой комнаты пользователем1
         self.client.login(email='user1@example.com', password='testpass')
         response = self.client.post(reverse('create_room'), {
             'quizSubject': 'History',
@@ -32,7 +32,7 @@ class RoomTests(TestCase):
         self.assertEqual(Room.objects.last().quizSubject, 'History')
 
     def test_update_room_settings_by_creator(self):
-        # Test updating room settings by the room creator
+        # Тест обновления настроек комнаты создателем комнаты
         self.client.login(email='user1@example.com', password='testpass')
         response = self.client.post(self.room_settings_url, {
             'quizSubject': 'Math',
@@ -45,7 +45,7 @@ class RoomTests(TestCase):
         self.assertEqual(self.room.timer, 45)
 
     def test_update_room_settings_by_non_creator(self):
-        # Test that a non-creator cannot update room settings
+        # Проверка того, что пользователь, не являющийся создателем, не может обновить настройки комнаты
         self.client.login(email='user2@example.com', password='testpass')
         response = self.client.post(self.room_settings_url, {
             'quizSubject': 'Geography',
@@ -58,7 +58,7 @@ class RoomTests(TestCase):
         self.assertNotEqual(self.room.timer, 20)
 
     def test_start_quiz_by_creator(self):
-        # Test that the room creator can start the quiz
+        # Тест, что создатель комнаты может начать викторину
         self.client.login(email='user1@example.com', password='testpass')
         response = self.client.post(self.start_quiz_url)
 
@@ -66,15 +66,15 @@ class RoomTests(TestCase):
         self.assertEqual(response.json().get('status'), 'Quiz started')
 
     def test_start_quiz_by_non_creator(self):
-        # Test that a non-creator cannot start the quiz
+        # Тест, что НЕ создатель, НЕ может начать викторину
         self.client.login(email='user2@example.com', password='testpass')
         response = self.client.post(self.start_quiz_url)
 
         self.assertEqual(response.status_code, 403)
         self.assertNotEqual(response.json().get('status'), 'Quiz started')
 
+    #Проверка, что для создания комнаты нужно залогиниться
     def test_room_creation_requires_login(self):
-        # Test that login is required to create a room
         response = self.client.post(reverse('create_room'), {
             'quizSubject': 'Literature',
             'timer': 40

@@ -8,7 +8,7 @@ from user.models import User
 @login_required
 def create_room(request):
     if request.method == 'POST':
-        # Room creation and user assignment as the room owner
+        # Создание комнаты и назначение пользователя владельцем комнаты
         quiz_subject = request.POST.get('quizSubject')
         timer = int(request.POST.get('timer', 30))  # default to 30 seconds if not set
 
@@ -24,15 +24,15 @@ def create_room(request):
 
 @login_required
 @require_POST
+# Только владелец может обновить настройки комнаты
 def update_room_settings(request, room_id):
-    # Only the room owner can update settings
     room = get_object_or_404(Room, id=room_id)
     participant = get_object_or_404(Participant, roomId=room, userId=request.user)
 
     if participant.userId != request.user:
         return JsonResponse({'error': 'Только владелец комнаты может изменять настройки'}, status=403)
 
-    # Update quiz subject and timer if provided in request
+    # Обновить тему викторины и таймер, если она в запросе
     quiz_subject = request.POST.get('quizSubject')
     timer = request.POST.get('timer')
 
@@ -47,20 +47,20 @@ def update_room_settings(request, room_id):
 @login_required
 @require_POST
 def start_game(request, room_id):
-    # Only the room owner can start the game
+    # Только владелец может начать игру
     room = get_object_or_404(Room, id=room_id)
     participant = get_object_or_404(Participant, roomId=room, userId=request.user)
 
     if participant.userId != request.user:
         return JsonResponse({'error': 'Только владелец комнаты может запустить игру'}, status=403)
 
-    # Game start logic here
-    # Send notifications or update status to indicate game start if needed
+    # Game start logic
+    #Сообщение, что игра началась
     return JsonResponse({'success': 'Игра начата'})
 
 @login_required
 def get_room_details(request, room_id):
-    # Retrieve room details for display
+    #Получение информации о комнате для отображения
     room = get_object_or_404(Room, id=room_id)
     participants = Participant.objects.filter(roomId=room).select_related('userId')
     participant_list = [{'name': p.userId.name, 'score': p.score} for p in participants]
