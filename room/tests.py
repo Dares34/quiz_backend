@@ -8,20 +8,16 @@ User = get_user_model()
 
 class RoomTests(TestCase):
     def setUp(self):
-        # Create users
         self.user1 = User.objects.create_user(email='user1@example.com', name='User 1', password='testpass')
         self.user2 = User.objects.create_user(email='user2@example.com', name='User 2', password='testpass')
 
-        # Создание комнтаы юзером1
         self.room = Room.objects.create(quizSubject="Science", timer=60)
         self.participant1 = Participant.objects.create(userId=self.user1, roomId=self.room, score=0)
 
-        # Пути URL-адресов для операций с комнатами
         self.room_settings_url = reverse('room_settings', args=[self.room.id])
         self.start_quiz_url = reverse('start_quiz', args=[self.room.id])
 
     def test_create_room(self):
-        # Создание тестовой комнаты пользователем1
         self.client.login(email='user1@example.com', password='testpass')
         response = self.client.post(reverse('create_room'), {
             'quizSubject': 'History',
@@ -79,4 +75,4 @@ class RoomTests(TestCase):
             'quizSubject': 'Literature',
             'timer': 40
         })
-        self.assertEqual(response.status_code, 302)  # Should redirect to login page
+        self.assertEqual(response.status_code, 302) 

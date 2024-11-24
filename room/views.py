@@ -8,9 +8,8 @@ from user.models import User
 @login_required
 def create_room(request):
     if request.method == 'POST':
-        # Создание комнаты и назначение пользователя владельцем комнаты
         quiz_subject = request.POST.get('quizSubject')
-        timer = int(request.POST.get('timer', 30))  # default to 30 seconds if not set
+        timer = int(request.POST.get('timer', 30))
 
         room = Room.objects.create(quizSubject=quiz_subject, timer=timer)
         Participant.objects.create(userId=request.user, roomId=room, score=0)
@@ -24,7 +23,6 @@ def create_room(request):
 
 @login_required
 @require_POST
-# Только владелец может обновить настройки комнаты
 def update_room_settings(request, room_id):
     room = get_object_or_404(Room, id=room_id)
     participant = get_object_or_404(Participant, roomId=room, userId=request.user)
@@ -47,20 +45,16 @@ def update_room_settings(request, room_id):
 @login_required
 @require_POST
 def start_game(request, room_id):
-    # Только владелец может начать игру
     room = get_object_or_404(Room, id=room_id)
     participant = get_object_or_404(Participant, roomId=room, userId=request.user)
 
     if participant.userId != request.user:
         return JsonResponse({'error': 'Только владелец комнаты может запустить игру'}, status=403)
-
-    # Game start logic
-    #Сообщение, что игра началась
+    
     return JsonResponse({'success': 'Игра начата'})
 
 @login_required
 def get_room_details(request, room_id):
-    #Получение информации о комнате для отображения
     room = get_object_or_404(Room, id=room_id)
     participants = Participant.objects.filter(roomId=room).select_related('userId')
     participant_list = [{'name': p.userId.name, 'score': p.score} for p in participants]
