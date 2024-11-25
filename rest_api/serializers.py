@@ -23,6 +23,9 @@ class AuthSerializer(serializers.Serializer):
 
 
 class RoomSerializer(serializers.ModelSerializer):
+    quiz_subject = serializers.CharField()
+    timer = serializers.IntegerField()
+
     class Meta:
         model = Room
-        fields = ['quizSubject', 'timer']
+        fields = ['quiz_subject', 'timer']

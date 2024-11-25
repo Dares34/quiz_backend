@@ -1,5 +1,5 @@
 from django.http import HttpRequest
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate
 from room.models import Room
 import random
 import string
+from .serializers import RoomSerializer
 
 
 class UsersViewSet(APIView):
@@ -53,18 +54,22 @@ class CreateUserView(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 #API создание комнаты
 class CreateRoomView(APIView):
     @extend_schema(
-        request={
-            "type": "object",
-            "properties": {
-                "quiz_subject": {"type": "string"},
-                "timer": {"type": "integer"}
-            },
-            "required": ["quiz_subject", "timer"]
-        },
-        responses={201: "Room created successfully", 400: "Validation error"}
+        request=RoomSerializer,
+        responses={201: "Room created successfully", 400: "Validation error"},
+        examples=[
+            OpenApiExample(
+                name="Create Room Example",
+                value={
+                    "quiz_subject": "Science",
+                    "timer": 30
+                },
+                description="Пример данных для создания комнаты"
+            )
+        ]
     )
     def post(self, request):
         quiz_subject = request.data.get('quiz_subject')
