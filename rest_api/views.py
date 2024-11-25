@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import UserSerializer
 from django.contrib.auth import authenticate
+from room.models import Room
+import random
+import string
 
 
 class UsersViewSet(APIView):
@@ -49,3 +52,41 @@ class CreateUserView(APIView):
                 'name': user.name
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#API создание комнаты
+class CreateRoomView(APIView):
+    @extend_schema(
+        request={
+            "type": "object",
+            "properties": {
+                "quiz_subject": {"type": "string"},
+                "timer": {"type": "integer"}
+            },
+            "required": ["quiz_subject", "timer"]
+        },
+        responses={201: "Room created successfully", 400: "Validation error"}
+    )
+    def post(self, request):
+        quiz_subject = request.data.get('quiz_subject')
+        timer = request.data.get('timer')
+
+        if not quiz_subject or not isinstance(timer, int):
+            return Response({'error': 'Invalid quiz_subject or timer'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Генерация кода приглашения
+        def generate_invitation_code():
+            return ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+
+        try:
+            invitation_code = generate_invitation_code()
+            room = Room.objects.create(
+                quizSubject=quiz_subject,
+                timer=timer,
+                invitation_code=invitation_code
+            )
+            return Response({
+                'message': 'Room created successfully',
+                'invitation_code': invitation_code
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
