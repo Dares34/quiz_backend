@@ -14,6 +14,8 @@ class UserManager(BaseUserManager):
     def create_user(self, email, name, password=None, role=None):
         if not email:
             raise ValueError('Users must have an email address')
+        if not role:
+            role = Roles.objects.get(name = "user")
         user = self.model(email=self.normalize_email(email), name=name, role=role)
         user.set_password(password)
         user.save(using=self._db)

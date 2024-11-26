@@ -3,6 +3,7 @@ from user.models import User
 from room.models import Room, Participant
 from quiz.models import Question, Quiz
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -22,6 +23,9 @@ class AuthSerializer(serializers.Serializer):
 
 
 class RoomSerializer(serializers.ModelSerializer):
+    quiz_subject = serializers.CharField()
+    timer = serializers.IntegerField()
+
     class Meta:
         model = Room
-        fields = ['quizSubject', 'timer']
+        fields = ['quiz_subject', 'timer']

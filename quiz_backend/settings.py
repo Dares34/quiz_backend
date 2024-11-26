@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-11d2@t0hg3a1ief_%115^76i^8+ree(hv7157u)dbyf!4c%rix
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'rest_api',
     # 'rest_framework_swagger',
     'drf_spectacular',
+    'drf_yasg',
+    'corsheaders',
 ]
 
 REST_FRAMEWORK = {
@@ -53,7 +55,7 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Quiz Project API',
-    'DESCRIPTION': 'Огромная документация для огромного ЧЛЕНА',
+    'DESCRIPTION': 'Отсюда тырить api',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
@@ -66,6 +68,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'quiz_backend.urls'
@@ -93,17 +97,21 @@ WSGI_APPLICATION = 'quiz_backend.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'quiz',
+    #     'USER': 'developer',
+    #     'PASSWORD': 'gIErkL',
+    #     'HOST': '185.128.105.41',
+    #     'PORT': '5433',
+    #     'TEST': {
+    #         'NAME': 'test_quiz',
+    #         'CHARSET': 'UTF8',
+    #     },
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'quiz',
-        'USER': 'developer',
-        'PASSWORD': 'gIErkL',
-        'HOST': '185.128.105.41',
-        'PORT': '5433',
-        'TEST': {
-            'NAME': 'test_quiz',
-            'CHARSET': 'UTF8',
-        },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -150,3 +158,9 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
+
+# CORS_ALLOWED_ORIGIN = ["*"]
+
+CORS_ALLOW_ALL_ORIGIN = True
+
+CORS_ALLOW_CREDENTIALS = True

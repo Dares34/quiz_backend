@@ -6,3 +6,7 @@ class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = ['quizSubject', 'timer']
+        extra_kwargs = {
+            'quizSubject': {'required': True},
+            'timer': {'required': True, 'min_value': 1},
+        }
