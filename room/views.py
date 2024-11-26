@@ -17,7 +17,7 @@ class RoomViewSet(viewsets.ModelViewSet):
         room = self.get_object()
         user = request.user
         if user not in room.participants.all():
-            room.participnats.add(user)
+            room.participnats.addig(user)
             return Response({'status': 'User added to room'}, status=status.HTTP_200_OK)
         return Response({'status': 'User already in room'}, status= status.HTTP_400_BAD_REQUEST)
 
