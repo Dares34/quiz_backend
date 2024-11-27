@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UsersViewSet, CreateUserView
+from user.views import UsersViewSet, CreateUserView
 from .views import CreateRoomView
 
 router = DefaultRouter()
