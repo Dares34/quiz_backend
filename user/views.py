@@ -3,10 +3,12 @@ from django.http import HttpRequest
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from rest_framework import status
 from rest_framework import serializers
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserSerializer
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from .serializers import UserSerializer, AuthSerializer
 from django.contrib.auth import authenticate
 
 class ErrorResponseSerializer(serializers.Serializer):
@@ -14,7 +16,7 @@ class ErrorResponseSerializer(serializers.Serializer):
 
 class UsersViewSet(APIView):
 
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     
     @extend_schema(
         tags = ["user"],
@@ -49,6 +51,9 @@ class UsersViewSet(APIView):
 
 
 class CreateUserView(APIView):
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+
     @extend_schema(
         tags = ["user"],
         summary="Создание пользователя",
@@ -66,3 +71,22 @@ class CreateUserView(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
+class CustomAuthToken(ObtainAuthToken):
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        tags = ['user'],
+        summary="Авторизация пользователя",
+    )
+    def post(self, request, *args, **kwargs):
+        # serializer = self.serializer_class(data=request.data, context={'request':request})
+        serializer = AuthSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.id,
+            'email':user.email,
+        })
