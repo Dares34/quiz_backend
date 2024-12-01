@@ -24,10 +24,10 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
-    path('api/leaderboard/', include('rest_api.urls')),
-    path('api/rooms/', include('room.urls')),
-    path('api/users/', include('user.urls')),
-    path('api/invitations/', include('invitation.urls')),
-    path('api/quizzes', include('quiz.urls')),
-    path('api/rooms_test/', include("room.urls")),
+    path('api/', include('rest_api.urls')),
+    # path('api/rooms/', include('room.urls')),
+    # path('api/users/', include('user.urls')),
+    # path('api/invitations/', include('invitation.urls')),
+    # path('api/quizzes', include('quiz.urls')),
+    # path('api/rooms_test/', include("room.urls")),
 ]
