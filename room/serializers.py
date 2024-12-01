@@ -1,8 +1,10 @@
 from rest_framework import serializers
-from user.models import User
 from room.models import Room, Participant
 
 class RoomSerializer(serializers.ModelSerializer):
+    quizSubject = serializers.CharField(max_length=255)
+    timer = serializers.IntegerField()
+
     class Meta:
         model = Room
         fields = ['quizSubject', 'timer']
@@ -10,3 +12,8 @@ class RoomSerializer(serializers.ModelSerializer):
             'quizSubject': {'required': True},
             'timer': {'required': True, 'min_value': 1},
         }
+
+    # def create(self, validated_data):
+    #     room = Room(**validated_data)
+    #     room.save()
+    #     return room

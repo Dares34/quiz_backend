@@ -8,7 +8,8 @@ router = DefaultRouter()
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('users/', include("user.urls"))
+    path('users/', include("user.urls")),
+    path('rooms/', include('room.urls')),
     # path('create_user/', CreateUserView.as_view(), name='create_user'),
     # path('get_user/', UsersViewSet.as_view(), name='get_user'),
     # path('create_room/', CreateRoomView.as_view(), name='create_room'),
