@@ -67,7 +67,31 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Отсюда тырить api',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_SETTINGS': {
+        'persistAuthorization': True,
+    },
+    'COMPONENT_SPLIT_REQUEST': True,
+    'COMPONENT_NO_READ_ONLY_REQUIRED': True,
+    'AUTHENTICATION_WHITELIST': ["rest_framework.authentication.TokenAuthentication"],
+    'SECURITY': [
+        {'TokenAuth': []},
+    ],
+    'COMPONENTS': {
+        'securitySchemes': {
+            'TokenAuth': {
+                'type': 'apiKey',
+                'in': 'header',
+                'name': 'Authorization',
+                'description': 'вводится в такой форме "Token <your_token>".',
+            }
+        },
+    },
+    'SWAGGER_UI_SETTINGS': {
+        'persistAuthorization': True,
+    },
 }
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

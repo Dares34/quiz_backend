@@ -16,39 +16,22 @@ class ErrorResponseSerializer(serializers.Serializer):
 
 class UsersViewSet(APIView):
 
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+    # permission_classes = [AllowAny]
     
     @extend_schema(
         tags = ["user"],
         summary = "Получение текущего ползователя",
-        
         responses={200: UserSerializer}
-        # request=UserSerializer,
-        # parameters=[
-        #     OpenApiParameter(
-        #         name='email',
-        #         required=True
-        #     ), OpenApiParameter(
-        #         name='password',
-        #         required=True
-        #     )
-        # ],
-        # responses={201: UserSerializer, 403: "Неправильный логин или пароль"}
     )
     def get(self, request: HttpRequest):
+        # print("Токен в запросе: ", request.headers)
+        # print("Текущий пользователь: ", request.user)
+        if not request.user.is_authenticated:
+            return Response({"detail": "пользователь не зарегистрирован"}, status=401)
+        
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
-        # email = request.GET.get('email', None)
-        # password = request.GET.get('password', None)
-        # user = authenticate(request, email=email, password=password)
-        # if not user:
-        #     return Response('Wrong email or password', status=403)
-        # return Response({
-        #     'name': user.name,
-        #     'email': user.email,
-        #     'role': user.role.name,  # или другой атрибут роли
-        # })
-
 
 class CreateUserView(APIView):
     # permission_classes = [IsAuthenticated]
@@ -78,6 +61,7 @@ class CustomAuthToken(ObtainAuthToken):
     @extend_schema(
         tags = ['user'],
         summary="Авторизация пользователя",
+        request=AuthSerializer,
     )
     def post(self, request, *args, **kwargs):
         # serializer = self.serializer_class(data=request.data, context={'request':request})
@@ -85,8 +69,9 @@ class CustomAuthToken(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
+        # print(f"Созданный токен: {token.key}")
         return Response({
-            'token': token.key,
+            'token': f'Token {token.key}',
             'user_id': user.id,
             'email':user.email,
         })

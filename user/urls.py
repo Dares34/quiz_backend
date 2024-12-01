@@ -25,5 +25,5 @@ urlpatterns = [
     path('create_user/', CreateUserView.as_view(), name='create_user'),
     path('get_user/', UsersViewSet.as_view(), name='get_user'),
     path('login/', CustomAuthToken.as_view(), name='login'),
-
+    path('api-token-auth/', CustomAuthToken.as_view(), name='api_token_auth'),
 ]

@@ -17,6 +17,22 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from drf_yasg.openapi import Parameter, TYPE_STRING, IN_HEADER
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Мой API",
+        default_version='v1',
+        description="Заклинание",
+    ),
+    public=True,
+    authentication_classes=[TokenAuthentication],
+    permission_classes=[IsAuthenticated],
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
