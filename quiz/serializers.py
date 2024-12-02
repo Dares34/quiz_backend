@@ -8,23 +8,28 @@ class QuestionSerializer(serializers.ModelSerializer):
         model = Question
         fields = ['id', 'data', 'name']
 
-class QuizSerializer(serializers.ModelSerializer):
-    room = RoomSerializer()
-    questions = QuestionSerializer(many=True)
+class QuizCreateSerializer(serializers.ModelSerializer):
+    room_id = serializers.IntegerField(write_only=True)
+    question_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Quiz
-        fields = ['id', 'room', 'questions']
+        fields = ['id', 'room_id', 'question_id']
 
     def create(self, validated_data):
-        room_data = validated_data.pop('room')
-        questions_data = validated_data.pop('questions')
+        room_id = validated_data.pop('room_id')
+        question_id = validated_data.pop('question_id')
 
-        room = Room.objects.create(**room_data)
-        quiz = Quiz.objects.create(room=room)
+        try:
+            room = Room.objects.get(id=room_id)
+        except Room.DoesNotExist:
+            raise serializers.ValidationError({'room_id': 'Комната не найдена.'})
 
-        for question_data in questions_data:
-            question = Question.objects.create(**question_data)
-            quiz.questions.add(question)
+        try:
+            question = Question.objects.get(id=question_id)
+        except Question.DoesNotExist:
+            raise serializers.ValidationError({'question_id': 'Вопрос не найден.'})
+
+        quiz = Quiz.objects.create(room=room, question=question)
 
         return quiz
