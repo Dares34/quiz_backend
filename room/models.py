@@ -2,10 +2,10 @@ from django.db import models
 from user.models import User
 import random
 import string
+# from rest_framework.views import APIView
 
 
 class Room(models.Model):
-    id = models.AutoField(primary_key=True)
     quizSubject = models.CharField(max_length=255)
     timer = models.IntegerField()
     invitation_code = models.CharField(max_length=5, unique=True, blank=True, null=True)
@@ -27,7 +27,6 @@ class Room(models.Model):
 
 
 class Participant(models.Model):
-    id = models.AutoField(primary_key=True)  # Инкрементируемый ID
     userId = models.ForeignKey(User, on_delete=models.CASCADE)
     roomId = models.ForeignKey(Room, on_delete=models.CASCADE)
     score = models.IntegerField()

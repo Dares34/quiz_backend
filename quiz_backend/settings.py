@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -51,16 +51,55 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    #     'rest_framework.authentication.TokenAuthentication',
+    # ],
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    # ),
+
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
+
+# REST_FRAMEWORK = {
+    
+#     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+#     'DEFAULT_PAGINATION_CLASS': 'belgorodshop.share.paginations.TotalPageNumberPagination',
+#     'PAGE_SIZE': 30,
+# }
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Quiz Project API',
     'DESCRIPTION': 'Отсюда тырить api',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    # 'SWAGGER_UI_SETTINGS': {
+    #     'persistAuthorization': True,
+    # },
+    'COMPONENT_SPLIT_REQUEST': True,
+    'COMPONENT_NO_READ_ONLY_REQUIRED': True,
+    # 'AUTHENTICATION_WHITELIST': ["rest_framework.authentication.TokenAuthentication"],
+    # 'SECURITY': [
+    #     {'TokenAuth': []},
+    # ],
+    # 'COMPONENTS': {
+    #     'securitySchemes': {
+    #         'TokenAuth': {
+    #             'type': 'apiKey',
+    #             'in': 'header',
+    #             'name': 'Authorization',
+    #             'description': 'вводится в такой форме "Token <your_token>".',
+    #         }
+    #     },
+    # },
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -68,9 +107,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 ROOT_URLCONF = 'quiz_backend.urls'
 
@@ -92,27 +132,34 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'quiz_backend.wsgi.application'
 
-
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=30),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(weeks=1),
+    'SLIDING_TOKEN_LIFETIME': timedelta(weeks=1),
+    'SLIDING_TOKEN_REFRESH_LIFETIME_LAZY': timedelta(weeks=1),
+    'SLIDING_TOKEN_LIFETIME_LAZY': timedelta(weeks=1),
+    'ROTATE_REFRESH_TOKENS': True,
+}
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': 'quiz',
-    #     'USER': 'developer',
-    #     'PASSWORD': 'gIErkL',
-    #     'HOST': '185.128.105.41',
-    #     'PORT': '5433',
-    #     'TEST': {
-    #         'NAME': 'test_quiz',
-    #         'CHARSET': 'UTF8',
-    #     },
-    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'quiz',
+        'USER': 'developer',
+        'PASSWORD': 'gIErkL',
+        'HOST': '185.128.105.41',
+        'PORT': '5433',
+        'TEST': {
+            'NAME': 'test_quiz',
+            'CHARSET': 'UTF8',
+        },
     }
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
 }
 
 
@@ -140,7 +187,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ru-RU'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
