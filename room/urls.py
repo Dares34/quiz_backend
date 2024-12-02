@@ -14,6 +14,6 @@ router.register(r'rooms', RoomAPIView, basename='room')
 urlpatterns = [
     # path('', placeholder_view, name='placeholder'),
     # path('rooms/create-room', views. name='room_settings'),
-    path('room/', RoomAPIView.as_view(), name='rooms'),
-    path('rooms/<int:room_id>/', RoomAPIView.as_view()),
+    path('', RoomAPIView.as_view(), name='rooms'),
+    # path('rooms/<int:room_id>/', RoomAPIView.as_view()),
 ]

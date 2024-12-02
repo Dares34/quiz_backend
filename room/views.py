@@ -34,49 +34,49 @@ class RoomAPIView(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    @extend_schema(
-        tags=["room"],
-        summary="Получить все комнаты",
-        responses={200: RoomSerializer(many=True)}
-    )
-    def get(self, request):
-        rooms = Room.objects.all()
-        serializer = RoomSerializer(rooms, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    # @extend_schema(
+    #     tags=["room"],
+    #     summary="Получить все комнаты",
+    #     responses={200: RoomSerializer(many=True)}
+    # )
+    # def get(self, request):
+    #     rooms = Room.objects.all()
+    #     serializer = RoomSerializer(rooms, many=True)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @extend_schema(
-        tags=["room"],
-        summary="Обновить данные комнаты",
-        responses={200: RoomSerializer}
-    )
-    def put(self, request, room_id):
-        try:
-            room = Room.objects.get(id=room_id)
-        except Room.DoesNotExist:
-            return Response({'error': 'Комната не найдена'}, status=status.HTTP_404_NOT_FOUND)
+    # @extend_schema(
+    #     tags=["room"],
+    #     summary="Обновить данные комнаты",
+    #     responses={200: RoomSerializer}
+    # )
+    # def put(self, request, room_id):
+    #     try:
+    #         room = Room.objects.get(id=room_id)
+    #     except Room.DoesNotExist:
+    #         return Response({'error': 'Комната не найдена'}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = RoomSerializer(room, data=request.data, partial=True)  # partial=True для частичного обновления
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                'success': 'Данные комнаты обновлены',
-                'room': serializer.data
-            }, status=status.HTTP_200_OK)
-        return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    #     serializer = RoomSerializer(room, data=request.data, partial=True)  # partial=True для частичного обновления
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response({
+    #             'success': 'Данные комнаты обновлены',
+    #             'room': serializer.data
+    #         }, status=status.HTTP_200_OK)
+    #     return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    @extend_schema(
-        tags=["room"],
-        summary="Удалить комнату",
-        responses={204: None}
-    )
-    def delete(self, request, room_id):
-        try:
-            room = Room.objects.get(id=room_id)
-        except Room.DoesNotExist:
-            return Response({'error': 'Комната не найдена'}, status=status.HTTP_404_NOT_FOUND)
+    # @extend_schema(
+    #     tags=["room"],
+    #     summary="Удалить комнату",
+    #     responses={204: None}
+    # )
+    # def delete(self, request, room_id):
+    #     try:
+    #         room = Room.objects.get(id=room_id)
+    #     except Room.DoesNotExist:
+    #         return Response({'error': 'Комната не найдена'}, status=status.HTTP_404_NOT_FOUND)
 
-        room.delete()
-        return Response({'success': 'Комната удалена'}, status=status.HTTP_204_NO_CONTENT)
+    #     room.delete()
+    #     return Response({'success': 'Комната удалена'}, status=status.HTTP_204_NO_CONTENT)
     
 
 # @login_required

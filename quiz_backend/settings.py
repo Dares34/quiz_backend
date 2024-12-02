@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -53,14 +53,24 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    #     'rest_framework.authentication.TokenAuthentication',
+    # ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+
+# REST_FRAMEWORK = {
+    
+#     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+#     'DEFAULT_PAGINATION_CLASS': 'belgorodshop.share.paginations.TotalPageNumberPagination',
+#     'PAGE_SIZE': 30,
+# }
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Quiz Project API',
@@ -125,7 +135,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'quiz_backend.wsgi.application'
 
-
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=30),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(weeks=1),
+    'SLIDING_TOKEN_LIFETIME': timedelta(weeks=1),
+    'SLIDING_TOKEN_REFRESH_LIFETIME_LAZY': timedelta(weeks=1),
+    'SLIDING_TOKEN_LIFETIME_LAZY': timedelta(weeks=1),
+    'ROTATE_REFRESH_TOKENS': True,
+}
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
