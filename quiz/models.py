@@ -1,20 +1,17 @@
 from django.db import models
-
+from room.models import Room
 
 class Question(models.Model):
-    text = models.CharField(max_length=255)
-    correctAnswer = models.CharField(max_length=255)
-    dificulty = models.CharField(max_length=255)
+    # room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="questions")
+    name = models.CharField(max_length=255)
+    data = models.JSONField()
 
     def __str__(self):
-        return self.text
-
+        return f"Question {self.id} in Room {self.room.name}"
 
 class Quiz(models.Model):
-    subjectArea = models.CharField(max_length=255)
-    questions = models.CharField(max_length=255)
-    currentQuestionIndex = models.ForeignKey(Question, on_delete=models.PROTECT)
-    timeLimit = models.IntegerField()
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="quizzes")
+    questions = models.ManyToManyField(Question, related_name="quizzes")
 
     def __str__(self):
-        return self.subjectArea
+        return f"Quiz for Room {self.room.id} with {self.questions.count()} questions"

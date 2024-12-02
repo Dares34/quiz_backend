@@ -3,36 +3,65 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
-from .models import Room, Participant
+from .models import Room
 from .serializers import RoomSerializer
 from user.models import User
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
-class RoomAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+class CreateRoomView(APIView):
+    permission_classes = [AllowAny]
+    # permission_classes = [IsAuthenticated]
+    serializer_class = RoomSerializer
 
     @extend_schema(
         tags=["room"],
-        summary="Создание комнаты",
-        responses={201: RoomSerializer}
+        summary="Создать команту",
+        responses={200: RoomSerializer(many=True)}
     )
     def post(self, request):
         serializer = RoomSerializer(data=request.data)
         if serializer.is_valid():
-            room = serializer.save()
-            Participant.objects.create(userId=request.user, roomId=room, score=0)
-            return Response({
-                'success': 'Комната создана',
-                'room_id': room.id,
-                'quiz_subject': room.quizSubject,
-                'timer': room.timer,
-                'invitation_code': room.invitation_code,
-            }, status=status.HTTP_201_CREATED)
-        return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            room = serializer.save()  # Сохранение комнаты
+            return Response(
+                {
+                    "success": "Комната успешно создана",
+                    "room": serializer.data
+                },
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(
+            {"error": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    
+class DeleteRoomView(APIView):
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+
+    serializer_class = RoomSerializer
+
+    @extend_schema(
+        tags=["room"],
+        summary="Удалить комнату",
+        responses={200: RoomSerializer}
+    )
+    def delete(self, request, pk):
+        try:
+            room = Room.objects.get(pk=pk)
+            room.delete()
+            return Response(
+                {"success": f"Комната с ID {pk} успешно удалена"},
+                status=status.HTTP_204_NO_CONTENT,
+            )
+        except Room.DoesNotExist:
+            return Response(
+                {"error": f"Комната с ID {pk} не найдена"},
+                status=status.HTTP_404_NOT_FOUND,
+            )    
 
     # @extend_schema(
     #     tags=["room"],
