@@ -1,6 +1,6 @@
 from django.urls import path
 from django.http import HttpResponse
-from .views import CreateUserView, UsersViewSet, CustomAuthToken
+from .views import CreateUserView, UsersViewSet, CustomAuth
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework.permissions import AllowAny
@@ -26,8 +26,5 @@ urlpatterns = [
     # path('', placeholder_view, name='placeholder'),  # Заглушка по основному пути
     path('create-user/', CreateUserView.as_view(), name='create_user'),
     path('get-user/', UsersViewSet.as_view(), name='get_user'),
-    path('login/', CustomAuthToken.as_view(), name='login'),
-    path('api-token-auth/', CustomAuthToken.as_view(), name='api_token_auth'),
-    path('login2/', TokenObtainPairView.as_view(), name='token-obtain-pair'),
-    path('refresh/', TokenRefreshView.as_view(), name='token-refresh'),
+    path('login/', CustomAuth.as_view(), name='login'),
 ]

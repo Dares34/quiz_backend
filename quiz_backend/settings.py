@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'quiz',
     'invitation',
     'rest_framework',
-    'rest_framework.authtoken',
     'rest_api',
     # 'rest_framework_swagger',
     'drf_spectacular',
@@ -56,9 +55,9 @@ REST_FRAMEWORK = {
     # 'DEFAULT_AUTHENTICATION_CLASSES': [
     #     'rest_framework.authentication.TokenAuthentication',
     # ],
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    # ),
 
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -77,28 +76,25 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Отсюда тырить api',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    'SWAGGER_UI_SETTINGS': {
-        'persistAuthorization': True,
-    },
+    # 'SWAGGER_UI_SETTINGS': {
+    #     'persistAuthorization': True,
+    # },
     'COMPONENT_SPLIT_REQUEST': True,
     'COMPONENT_NO_READ_ONLY_REQUIRED': True,
-    'AUTHENTICATION_WHITELIST': ["rest_framework.authentication.TokenAuthentication"],
-    'SECURITY': [
-        {'TokenAuth': []},
-    ],
-    'COMPONENTS': {
-        'securitySchemes': {
-            'TokenAuth': {
-                'type': 'apiKey',
-                'in': 'header',
-                'name': 'Authorization',
-                'description': 'вводится в такой форме "Token <your_token>".',
-            }
-        },
-    },
-    'SWAGGER_UI_SETTINGS': {
-        'persistAuthorization': True,
-    },
+    # 'AUTHENTICATION_WHITELIST': ["rest_framework.authentication.TokenAuthentication"],
+    # 'SECURITY': [
+    #     {'TokenAuth': []},
+    # ],
+    # 'COMPONENTS': {
+    #     'securitySchemes': {
+    #         'TokenAuth': {
+    #             'type': 'apiKey',
+    #             'in': 'header',
+    #             'name': 'Authorization',
+    #             'description': 'вводится в такой форме "Token <your_token>".',
+    #         }
+    #     },
+    # },
 }
 
 MIDDLEWARE = [
@@ -148,22 +144,22 @@ SIMPLE_JWT = {
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': 'quiz',
-    #     'USER': 'developer',
-    #     'PASSWORD': 'gIErkL',
-    #     'HOST': '185.128.105.41',
-    #     'PORT': '5433',
-    #     'TEST': {
-    #         'NAME': 'test_quiz',
-    #         'CHARSET': 'UTF8',
-    #     },
-    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'quiz',
+        'USER': 'developer',
+        'PASSWORD': 'gIErkL',
+        'HOST': '185.128.105.41',
+        'PORT': '5433',
+        'TEST': {
+            'NAME': 'test_quiz',
+            'CHARSET': 'UTF8',
+        },
     }
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
 }
 
 

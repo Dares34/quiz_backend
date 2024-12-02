@@ -11,34 +11,52 @@ from rest_framework.authtoken.models import Token
 from .serializers import UserSerializer, AuthSerializer
 from django.contrib.auth import authenticate
 
+
 class ErrorResponseSerializer(serializers.Serializer):
     detail = serializers.CharField(help_text="Описание ошибки")
 
+
 class UsersViewSet(APIView):
 
-    permission_classes = [IsAuthenticated]
-    # permission_classes = [AllowAny]
-    
+    permission_classes = [AllowAny]
+
     @extend_schema(
-        tags = ["user"],
-        summary = "Получение текущего ползователя",
+        tags=["user"],
+        summary="Получение текущего ползователя",
+        parameters=[
+            OpenApiParameter(
+                name="email",
+                description="Электронная почта пользователя",
+                required=True,
+                type=str,
+                location=OpenApiParameter.QUERY
+            ),
+            OpenApiParameter(
+                name="password",
+                description="Пароль пользователя",
+                required=True,
+                type=str,
+                location=OpenApiParameter.QUERY
+            ),
+        ],
         responses={200: UserSerializer}
     )
     def get(self, request: HttpRequest):
-        # print("Токен в запросе: ", request.headers)
-        # print("Текущий пользователь: ", request.user)
-        if not request.user.is_authenticated:
-            return Response({"detail": "пользователь не зарегистрирован"}, status=401)
-        
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data)
+        email = request.GET.get('email')
+        password = request.GET.get('password')
+        user = authenticate(email=email, password=password)
+        if not user:
+            return Response({"detail": "Пользователь не зарегистрирован или данные неверны"}, status=401)
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=200)
+
 
 class CreateUserView(APIView):
     # permission_classes = [IsAuthenticated]
     permission_classes = [AllowAny]
 
     @extend_schema(
-        tags = ["user"],
+        tags=["user"],
         summary="Создание пользователя",
         request=UserSerializer,
         responses={201: UserSerializer, 400: ErrorResponseSerializer}
@@ -50,28 +68,24 @@ class CreateUserView(APIView):
             return Response({
                 'id': user.id,
                 'email': user.email,
-                'name': user.name
+                'name': user.name,
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
-class CustomAuthToken(ObtainAuthToken):
+
+class CustomAuth(APIView):
     permission_classes = [AllowAny]
 
     @extend_schema(
-        tags = ['user'],
+        tags=['user'],
         summary="Авторизация пользователя",
         request=AuthSerializer,
     )
     def post(self, request, *args, **kwargs):
-        # serializer = self.serializer_class(data=request.data, context={'request':request})
         serializer = AuthSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
-        # print(f"Созданный токен: {token.key}")
         return Response({
-            'token': f'Token {token.key}',
             'user_id': user.id,
-            'email':user.email,
+            'email': user.email,
         })
