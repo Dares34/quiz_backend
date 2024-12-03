@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpRequest
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, extend_schema_view
 from rest_framework import status
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -8,6 +9,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+
+from .models import User
 from .serializers import UserSerializer, AuthSerializer
 from django.contrib.auth import authenticate
 
@@ -89,3 +92,20 @@ class CustomAuth(APIView):
             'user_id': user.id,
             'email': user.email,
         })
+
+
+class IncrementWinsView(APIView):
+    permission_classes = [AllowAny]
+
+    @extend_schema(description="Запрос на увеличение количества побед пользователя по email")
+    def post(self, request: HttpRequest):
+        email = request.data.get("email")
+        if not email:
+            return Response({"detail": "Email не предоставлен"}, status=400)
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"detail": "Пользователь не найден"}, status=404)
+        user.wins += 1
+        user.save()
+        return Response({"email": user.email, "wins": user.wins}, status=200)
