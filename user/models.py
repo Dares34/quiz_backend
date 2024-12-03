@@ -24,7 +24,6 @@ class UserManager(BaseUserManager):
         return self.create_user(email, name, password, **extra_fields)
         
 
-
 class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(max_length=255, unique=True)
@@ -34,6 +33,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     data_joined = models.DateTimeField(auto_now_add = True)
     # last_login = models.DateTimeField(null = True, blank = True)
+    wins = models.IntegerField(default=0)
     
     objects = UserManager()
 
