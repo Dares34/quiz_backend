@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from .models import Room
-from .serializers import RoomSerializer, RoomStatusSerializer
+from .serializers import RoomSerializer, RoomStatusSerializer, AddParticipantSerializer, IncrementScoreSerializer
 from user.models import User
 from rest_framework.response import Response
 from rest_framework import status
@@ -44,6 +44,62 @@ class CreateRoomView(APIView):
     def create_room_session(sender, instance, created, **kwargs):
         if created:
             instance.create_session_in_redis()
+
+
+class AddParticipantView(APIView):
+    permission_classes = [AllowAny]
+    # permission_classes = [IsAuthenticated]
+    serializer_class = AddParticipantSerializer
+    @extend_schema(
+        tags=["room"],
+        summary="Добавить участника в комнату",
+        description="Добавляет участника в указанную комнату по ID комнаты.",
+        request=AddParticipantSerializer,
+        responses={
+            200: {"type": "object", "properties": {"success": {"type": "string"}}},
+            404: {"type": "object", "properties": {"error": {"type": "string"}}},
+        }
+    )
+    def post(self, request, room_id):
+        serializer = AddParticipantSerializer(data=request.data)
+        if serializer.is_valid():
+            participant_id = serializer.validated_data["participant_id"]
+            participant_name = serializer.validated_data["participant_name"]
+            try:
+                room = Room.objects.get(id=room_id)
+                room.add_participant(participant_id, participant_name)
+                return Response({"success": f"Участник {participant_name} добавлен в комнату {room_id}"}, status=status.HTTP_200_OK)
+            except Room.DoesNotExist:
+                return Response({"error": "Комната не найдена"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class IncrementScoreView(APIView):
+    permission_classes = [AllowAny]
+    # permission_classes = [IsAuthenticated]
+    serializer_class = IncrementScoreSerializer
+    @extend_schema(
+        tags=["room"],
+        summary="Увеличить очки участника",
+        description="Увеличивает очки указанного участника в комнате на заданное количество.",
+        request=IncrementScoreSerializer,
+        responses={
+            200: {"type": "object", "properties": {"success": {"type": "string"}}},
+            404: {"type": "object", "properties": {"error": {"type": "string"}}},
+        }
+    )
+    def post(self, request, room_id):
+        serializer = IncrementScoreSerializer(data=request.data)
+        if serializer.is_valid():
+            participant_id = serializer.validated_data["participant_id"]
+            score = serializer.validated_data["score"]
+            try:
+                room = Room.objects.get(id=room_id)
+                room.increment_score(participant_id, score)
+                return Response({"success": f"Очки увеличены для участника {participant_id} в комнате {room_id}"}, status=status.HTTP_200_OK)
+            except Room.DoesNotExist:
+                return Response({"error": "Комната не найдена"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 class RoomStatusView(APIView):
     permission_classes = [AllowAny]

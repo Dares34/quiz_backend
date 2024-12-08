@@ -10,6 +10,14 @@ class RoomSerializer(serializers.ModelSerializer):
         model = Room
         fields = ['id', 'quiz_subject', 'invitation_code', 'questions']
 
+class AddParticipantSerializer(serializers.Serializer):
+    participant_id = serializers.CharField(max_length=255)
+    participant_name = serializers.CharField(max_length=255)
+
+class IncrementScoreSerializer(serializers.Serializer):
+    participant_id = serializers.CharField(max_length=255)
+    score = serializers.IntegerField(default=1, min_value=1)
+
 class RoomStatusSerializer(serializers.Serializer):
     participants = serializers.ListField(
         child=serializers.ListField(child=serializers.CharField()),

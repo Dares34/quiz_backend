@@ -44,11 +44,14 @@ class Room(models.Model):
         session_key = f"room:{self.id}"
         redis_client.delete(session_key)
 
-    def add_participant_to_room(room_id, participant_id, participant_name):
-        session_key = f"room:{room_id}"
+    def add_participant(self, participant_id, participant_name):
+        session_key = f"room:{self.id}"
         participants = json.loads(redis_client.hget(session_key, "participants") or "[]")
-        participants.append({"id": participant_id, "name": participant_name})
-        redis_client.hset(session_key, "participants", json.dumps(participants))
+        if not any(p["id"] == participant_id for p in participants):
+            participants.append({"id": participant_id, "name": participant_name})
+            redis_client.hset(session_key, "participants", json.dumps(participants))
+        else:
+            print(f"Участник {participant_name} уже в комнате {self.id}")
 
     def get_room_data(room_id):
         session_key = f"room:{room_id}"
@@ -63,10 +66,13 @@ class Room(models.Model):
             "invitation_code": room_data.get(b"invitation_code", "").decode(),
         }
 
-    def update_score(room_id, participant_id, score):
-        session_key = f"room:{room_id}"
+    def increment_score(self, participant_id, score):
+        session_key = f"room:{self.id}"
         scores = json.loads(redis_client.hget(session_key, "scores") or "{}")
-        scores[participant_id] = scores.get(participant_id, 0) + score
+        if participant_id in scores:
+            scores[participant_id] += score
+        else:
+            scores[participant_id] = score
         redis_client.hset(session_key, "scores", json.dumps(scores))
 
     def get_scores(room_id):

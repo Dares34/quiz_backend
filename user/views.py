@@ -57,7 +57,6 @@ class UsersViewSet(APIView):
 class CreateUserView(APIView):
     # permission_classes = [IsAuthenticated]
     permission_classes = [AllowAny]
-
     @extend_schema(
         tags=["user"],
         summary="Создание пользователя",
@@ -78,7 +77,6 @@ class CreateUserView(APIView):
 
 class CustomAuth(APIView):
     permission_classes = [AllowAny]
-
     @extend_schema(
         tags=['user'],
         summary="Авторизация пользователя",
