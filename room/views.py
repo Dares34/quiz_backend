@@ -4,13 +4,14 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from .models import Room
-from .serializers import RoomSerializer
+from .serializers import RoomSerializer, RoomStatusSerializer
 from user.models import User
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 class CreateRoomView(APIView):
     permission_classes = [AllowAny]
@@ -38,6 +39,36 @@ class CreateRoomView(APIView):
             status=status.HTTP_400_BAD_REQUEST,
         )
     
+    @receiver(post_save, sender = Room)
+    def create_room_session(sender, instance, created, **kwargs):
+        if created:
+            instance.create_session_in_redis()
+
+class RoomStatusView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = RoomStatusSerializer
+    @extend_schema(
+        tags=["room"],
+        summary="Просмотреть параметры комнаты",
+        parameters=[
+            OpenApiParameter(
+                name="room_id",
+                description="id комнаты",
+                required=True,
+                type=int,
+                location=OpenApiParameter.QUERY
+            ),
+        ],
+        responses={200: RoomStatusSerializer}
+    )
+    def get(self, request):
+        room_id = request.query_params.get('room_id')
+        room_data = Room.get_room_data(room_id)
+        if not room_data:
+            return Response({'error':"Комната не найдена"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"room_data":room_data})
+
+
 class DeleteRoomView(APIView):
     # permission_classes = [IsAuthenticated]
     permission_classes = [AllowAny]
@@ -63,6 +94,9 @@ class DeleteRoomView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )    
 
+    @receiver(post_delete, sender=Room)
+    def delete_room_session(sender, instance, **kwargs):
+        instance.delete_session_in_redis()
     # @extend_schema(
     #     tags=["room"],
     #     summary="Получить все комнаты",

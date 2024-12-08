@@ -22,6 +22,8 @@ from rest_framework.permissions import IsAuthenticated
 from drf_yasg.openapi import Parameter, TYPE_STRING, IN_HEADER
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
+import debug_toolbar
+
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -41,6 +43,8 @@ urlpatterns = [
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
     path('api/', include('rest_api.urls')),
+
+    path('__debug__/', include(debug_toolbar.urls)),
     # path('api/rooms/', include('room.urls')),
     # path('api/users/', include('user.urls')),
     # path('api/invitations/', include('invitation.urls')),

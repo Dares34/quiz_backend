@@ -3,7 +3,7 @@ from room.models import Room
 
 class Question(models.Model):
     # room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="questions")
-    name = models.CharField(max_length=255, blank=True, null=True)
+    quiz_subject = models.CharField(max_length=255, blank=True, null=True)
     data = models.JSONField(blank=True, null=True)
 
     def __str__(self):
@@ -15,3 +15,4 @@ class Quiz(models.Model):
 
     def __str__(self):
         return f"Quiz for Room {self.room.id} with {self.questions.count()} questions"
+
