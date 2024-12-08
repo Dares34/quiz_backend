@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import CreateQuizView
-
+from django.http import HttpResponse
+from .views import CreateQuizQuestionsView
 urlpatterns = [
-    path('create/', CreateQuizView.as_view(), name='create-room'),
+    path('create-question', CreateQuizQuestionsView.as_view(), name = "question-create"),
 ]

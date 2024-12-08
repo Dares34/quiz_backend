@@ -26,7 +26,8 @@ class CreateRoomView(APIView):
     def post(self, request):
         serializer = RoomSerializer(data=request.data)
         if serializer.is_valid():
-            room = serializer.save()  # Сохранение комнаты
+            room = serializer.save()
+            room.assign_questions_by_subject()
             return Response(
                 {
                     "success": "Комната успешно создана",
@@ -97,6 +98,7 @@ class DeleteRoomView(APIView):
     @receiver(post_delete, sender=Room)
     def delete_room_session(sender, instance, **kwargs):
         instance.delete_session_in_redis()
+
     # @extend_schema(
     #     tags=["room"],
     #     summary="Получить все комнаты",

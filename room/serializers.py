@@ -1,10 +1,14 @@
 from rest_framework import serializers
 from room.models import Room
+from quiz.serializers import QuestionSerializer
 
 class RoomSerializer(serializers.ModelSerializer):
+    questions = QuestionSerializer(
+        many=True, read_only=True
+    )
     class Meta:
         model = Room
-        fields = ['id', 'quiz_subject', 'invitation_code']
+        fields = ['id', 'quiz_subject', 'invitation_code', 'questions']
 
 class RoomStatusSerializer(serializers.Serializer):
     participants = serializers.ListField(

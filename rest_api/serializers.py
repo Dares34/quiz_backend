@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from room.models import Room
-from quiz.models import Question, Quiz
+from quiz.models import Question
 
 class RoomSerializer(serializers.ModelSerializer):
     quiz_subject = serializers.CharField()
