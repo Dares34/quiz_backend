@@ -27,7 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -42,12 +41,12 @@ INSTALLED_APPS = [
     'invitation',
     'rest_framework',
     'rest_api',
-    # 'rest_framework_swagger',
     'drf_spectacular',
     'drf_yasg',
     'corsheaders',
-    # 'debug_toolbar',
+    'channels',
 ]
+
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
@@ -71,7 +70,18 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
-        # "KEY_PREFIX": "quiz_backend",
+    }
+}
+
+CHANNEL_LAYERS = {
+    # "default": {
+    #     "BACKEND": "channels_redis.core.RedisChannelLayer",
+    #     "CONFIG": {
+    #         "hosts": [("127.0.0.1", 6379)],
+    #     },
+    # },
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
     }
 }
 
@@ -91,7 +101,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -117,18 +127,16 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'quiz_backend.wsgi.application'
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=30),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(weeks=1),
-    'SLIDING_TOKEN_LIFETIME': timedelta(weeks=1),
-    'SLIDING_TOKEN_REFRESH_LIFETIME_LAZY': timedelta(weeks=1),
-    'SLIDING_TOKEN_LIFETIME_LAZY': timedelta(weeks=1),
-    'ROTATE_REFRESH_TOKENS': True,
-}
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+# WSGI_APPLICATION = 'quiz_backend.wsgi.application'
+ASGI_APPLICATION = "quiz_backend.asgi.application"
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(seconds=30),
+#     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(weeks=1),
+#     'SLIDING_TOKEN_LIFETIME': timedelta(weeks=1),
+#     'SLIDING_TOKEN_REFRESH_LIFETIME_LAZY': timedelta(weeks=1),
+#     'SLIDING_TOKEN_LIFETIME_LAZY': timedelta(weeks=1),
+#     'ROTATE_REFRESH_TOKENS': True,
+# }
 
 DATABASES = {
     # 'default': {
@@ -148,9 +156,6 @@ DATABASES = {
             'NAME': BASE_DIR / 'db.sqlite3',
         }
 }
-
-# Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -194,4 +199,4 @@ AUTH_USER_MODEL = 'user.User'
 
 CORS_ALLOW_ALL_ORIGIN = True
 
-CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOW_CREDENTIALS = True
