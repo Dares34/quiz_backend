@@ -14,6 +14,9 @@ class AddParticipantSerializer(serializers.Serializer):
     participant_id = serializers.CharField(max_length=255)
     participant_name = serializers.CharField(max_length=255)
 
+class DeleteParticipantSerializer(serializers.Serializer):
+    participant_id = serializers.IntegerField()
+
 class IncrementScoreSerializer(serializers.Serializer):
     participant_id = serializers.CharField(max_length=255)
     score = serializers.IntegerField(default=1, min_value=1)
