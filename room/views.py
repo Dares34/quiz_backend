@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
-from .models import Room
+from .models import Room, redis_client
 from .serializers import RoomSerializer, RoomStatusSerializer, AddParticipantSerializer, IncrementScoreSerializer
 from user.models import User
 from rest_framework.response import Response
@@ -12,6 +12,10 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from django.core.exceptions import ObjectDoesNotExist
+from drf_spectacular.utils import extend_schema
+from django_redis import get_redis_connection
+import  json
 
 class CreateRoomView(APIView):
     permission_classes = [AllowAny]
@@ -48,8 +52,8 @@ class CreateRoomView(APIView):
 
 class AddParticipantView(APIView):
     permission_classes = [AllowAny]
-    # permission_classes = [IsAuthenticated]
     serializer_class = AddParticipantSerializer
+
     @extend_schema(
         tags=["room"],
         summary="Добавить участника в комнату",
@@ -57,6 +61,7 @@ class AddParticipantView(APIView):
         request=AddParticipantSerializer,
         responses={
             200: {"type": "object", "properties": {"success": {"type": "string"}}},
+            400: {"type": "object", "properties": {"error": {"type": "string"}}},
             404: {"type": "object", "properties": {"error": {"type": "string"}}},
         }
     )
@@ -65,14 +70,40 @@ class AddParticipantView(APIView):
         if serializer.is_valid():
             participant_id = serializer.validated_data["participant_id"]
             participant_name = serializer.validated_data["participant_name"]
+
+            # Проверяем существование комнаты
             try:
                 room = Room.objects.get(id=room_id)
-                room.add_participant(participant_id, participant_name)
-                return Response({"success": f"Участник {participant_name} добавлен в комнату {room_id}"}, status=status.HTTP_200_OK)
             except Room.DoesNotExist:
                 return Response({"error": "Комната не найдена"}, status=status.HTTP_404_NOT_FOUND)
+
+            # Проверяем существование участника в базе данных
+            try:
+                user = User.objects.get(id=participant_id)
+            except User.DoesNotExist:
+                return Response({"error": "Пользователь не существует"}, status=status.HTTP_404_NOT_FOUND)
+
+            # Получаем список участников комнаты из Redis
+            session_key = f"room:{room.id}"
+            participants = json.loads(redis_client.hget(session_key, "participants") or "[]")
+
+            # Проверяем, не превышен ли лимит участников
+            if len(participants) >= 4:
+                return Response({"error": "В комнате уже 4 участника"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Проверяем, не добавлен ли участник уже в комнату
+            if any(p["id"] == participant_id for p in participants):
+                return Response({"error": f"Участник {participant_name} уже в комнате"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Добавляем участника
+            participants.append({"id": participant_id, "name": participant_name})
+            redis_client.hset(session_key, "participants", json.dumps(participants))
+
+            return Response({"success": f"Участник {participant_name} добавлен в комнату {room_id}"}, status=status.HTTP_200_OK)
+
+        # Если сериализатор невалиден
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 class IncrementScoreView(APIView):
     permission_classes = [AllowAny]
     # permission_classes = [IsAuthenticated]

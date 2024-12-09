@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 from user.models import User
 from quiz.models import Question
 import random
@@ -14,8 +15,9 @@ class Room(models.Model):
     questions = models.ManyToManyField(
         'quiz.Question',
         blank=True,
-        related_name = 'rooms'
+        related_name='rooms'
     )
+    timer = models.IntegerField(default=0)
 
     def __str__(self):
         return f"Room {self.id} - {self.quiz_subject}"
@@ -47,6 +49,13 @@ class Room(models.Model):
     def add_participant(self, participant_id, participant_name):
         session_key = f"room:{self.id}"
         participants = json.loads(redis_client.hget(session_key, "participants") or "[]")
+
+        # Проверка существования пользователя в базе данных
+        try:
+            user = User.objects.get(id=participant_id)
+        except ObjectDoesNotExist:
+            print(f"Ошибка: пользователь с ID {participant_id} не существует.")
+            return
 
         # Проверка лимита участников
         if len(participants) >= 4:

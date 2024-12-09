@@ -8,7 +8,7 @@ class RoomSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Room
-        fields = ['id', 'quiz_subject', 'invitation_code', 'questions']
+        fields = ['id', 'quiz_subject', 'invitation_code', 'questions', 'timer']
 
 class AddParticipantSerializer(serializers.Serializer):
     participant_id = serializers.CharField(max_length=255)
