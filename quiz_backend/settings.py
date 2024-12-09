@@ -140,22 +140,22 @@ ASGI_APPLICATION = "quiz_backend.asgi.application"
 # }
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': 'quiz',
-    #     'USER': 'developer',
-    #     'PASSWORD': 'gIErkL',
-    #     'HOST': '185.128.105.41',
-    #     'PORT': '5433',
-    #     'TEST': {
-    #         'NAME': 'test_quiz',
-    #         # 'CHARSET': 'UTF8',
-    #     },
-    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'quiz',
+        'USER': 'developer',
+        'PASSWORD': 'gIErkL',
+        'HOST': '185.128.105.41',
+        'PORT': '5433',
+        'TEST': {
+            'NAME': 'test_quiz',
+            # 'CHARSET': 'UTF8',
+        },
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
