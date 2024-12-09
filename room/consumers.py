@@ -1,12 +1,10 @@
 import json
-import logging
 
-logger = logging.getLogger(__name__)
 from channels.generic.websocket import AsyncWebsocketConsumer
-from channels.consumer import AsyncConsumer
-class RoomConsumer(AsyncConsumer):
-    async def websocket_connect(self):
-        logger.info(f"Attempting to connect to room: {self.scope['url_route']['kwargs']}")
+# from channels.consumer import AsyncConsumer
+
+class RoomConsumer(AsyncWebsocketConsumer):
+    async def websocket_connect(self, event):
         self.room_code = self.scope['url_route']['kwargs']['room_code']
         self.room_group_name = f"room_{self.room_code}"
 
@@ -18,8 +16,8 @@ class RoomConsumer(AsyncConsumer):
 
         await self.accept()
 
-    async def disconnect(self, close_code):
-        # Удаляем WebSocket из группы
+    async def websocket_disconnect(self, event):
+        # Логика при отключении
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
