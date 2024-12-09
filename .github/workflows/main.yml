@@ -52,6 +52,8 @@ jobs:
           python manage.py migrate
 
       - name: Deploy application
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
         run: |
           ssh root@$SERVER_IP "
             cd quiz_backend/
