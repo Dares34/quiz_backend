@@ -71,37 +71,28 @@ class AddParticipantView(APIView):
             participant_id = serializer.validated_data["participant_id"]
             participant_name = serializer.validated_data["participant_name"]
 
-            # Проверяем существование комнаты
             try:
                 room = Room.objects.get(id=room_id)
             except Room.DoesNotExist:
                 return Response({"error": "Комната не найдена"}, status=status.HTTP_404_NOT_FOUND)
-
-            # Проверяем существование участника в базе данных
             try:
                 user = User.objects.get(id=participant_id)
             except User.DoesNotExist:
                 return Response({"error": "Пользователь не существует"}, status=status.HTTP_404_NOT_FOUND)
 
-            # Получаем список участников комнаты из Redis
             session_key = f"room:{room.id}"
             participants = json.loads(redis_client.hget(session_key, "participants") or "[]")
-
-            # Проверяем, не превышен ли лимит участников
             if len(participants) >= 4:
                 return Response({"error": "В комнате уже 4 участника"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Проверяем, не добавлен ли участник уже в комнату
             if any(p["id"] == participant_id for p in participants):
                 return Response({"error": f"Участник {participant_name} уже в комнате"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Добавляем участника
             participants.append({"id": participant_id, "name": participant_name})
             redis_client.hset(session_key, "participants", json.dumps(participants))
 
             return Response({"success": f"Участник {participant_name} добавлен в комнату {room_id}"}, status=status.HTTP_200_OK)
 
-        # Если сериализатор невалиден
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class IncrementScoreView(APIView):
