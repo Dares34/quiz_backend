@@ -47,11 +47,19 @@ class Room(models.Model):
     def add_participant(self, participant_id, participant_name):
         session_key = f"room:{self.id}"
         participants = json.loads(redis_client.hget(session_key, "participants") or "[]")
+
+        # Проверка лимита участников
+        if len(participants) >= 4:
+            print(f"Невозможно добавить {participant_name}: в комнате {self.id} уже 4 участника.")
+            return
+
+        # Проверка на дублирование участника
         if not any(p["id"] == participant_id for p in participants):
             participants.append({"id": participant_id, "name": participant_name})
             redis_client.hset(session_key, "participants", json.dumps(participants))
+            print(f"Участник {participant_name} успешно добавлен в комнату {self.id}.")
         else:
-            print(f"Участник {participant_name} уже в комнате {self.id}")
+            print(f"Участник {participant_name} уже в комнате {self.id}.")
 
     def get_room_data(room_id):
         session_key = f"room:{room_id}"
