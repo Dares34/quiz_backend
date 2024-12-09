@@ -24,19 +24,23 @@ class IncrementScoreSerializer(serializers.Serializer):
 class RoomStatusSerializer(serializers.Serializer):
     participants = serializers.ListField(
         child=serializers.ListField(child=serializers.CharField()),
-        default = [],
-        help_text = "Список участников комнатыб каждый из которых представлен в виде словаря с ID и именем"
+        default=[],
+        help_text="Список участников комнаты, каждый из которых представлен в виде словаря с ID и именем"
     )
     scores = serializers.DictField(
-        child = serializers.IntegerField(),
-        default = {},
-        help_text = "Список очков участников, где ключ - Id участника, со значением - количество очков",
+        child=serializers.IntegerField(),
+        default={},
+        help_text="Список очков участников, где ключ - Id участника, со значением - количество очков"
     )
     quiz_subject = serializers.CharField(
-        max_length = 255, 
-        help_text = "Предмет квиза в комнате",
+        max_length=255,
+        help_text="Предмет квиза в комнате"
     )
     invitation_code = serializers.CharField(
-        max_length = 5,
-        help_text = "Код комнаты",
+        max_length=5,
+        help_text="Код комнаты"
+    )
+    timer = serializers.IntegerField(
+        help_text="Таймер для комнаты (в секундах)",
+        required=False
     )

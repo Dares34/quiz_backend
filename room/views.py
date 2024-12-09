@@ -168,6 +168,7 @@ class IncrementScoreView(APIView):
 class RoomStatusView(APIView):
     permission_classes = [AllowAny]
     serializer_class = RoomStatusSerializer
+
     @extend_schema(
         tags=["room"],
         summary="Просмотреть параметры комнаты",
@@ -186,9 +187,8 @@ class RoomStatusView(APIView):
         room_id = request.query_params.get('room_id')
         room_data = Room.get_room_data(room_id)
         if not room_data:
-            return Response({'error':"Комната не найдена"}, status=status.HTTP_404_NOT_FOUND)
-        return Response({"room_data":room_data})
-
+            return Response({'error': "Комната не найдена"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"room_data": room_data})
 
 class DeleteRoomView(APIView):
     # permission_classes = [IsAuthenticated]

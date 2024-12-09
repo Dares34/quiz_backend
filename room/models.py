@@ -81,6 +81,7 @@ class Room(models.Model):
             "status": room_data.get(b"status", b"waiting").decode(),
             "quiz_subject": room_data.get(b"quiz_subject", "").decode(),
             "invitation_code": room_data.get(b"invitation_code", "").decode(),
+            "timer": int(room_data.get(b"timer", b"0").decode()),
         }
 
     def increment_score(self, participant_id, score):
