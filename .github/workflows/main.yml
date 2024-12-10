@@ -55,7 +55,7 @@ jobs:
         env:
           SERVER_IP: ${{ secrets.SERVER_IP }}
         run: |
-          ssh root@$SERVER_IP "
+          ssh -i ~/.ssh/id_rsa root@$SERVER_IP "
             cd quiz_backend/
             git pull && 
             source venv/bin/activate && 
